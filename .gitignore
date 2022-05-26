@@ -127,4 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ƒобавлени€ автора
 .idea
+result.xlsx
+исходные данные.xlsx
+ограничени€.xlsx
