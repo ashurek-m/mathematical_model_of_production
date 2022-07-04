@@ -12,6 +12,7 @@ def save_excel(path, data_frame, columns=True):
 df = pd.read_excel('entry.xlsx', sheet_name='model')
 df_2 = df.dropna(subset='наименование', axis=0)
 df_2.info()
+df_rest = pd.read_excel('restrictions.xlsx')
 # величина смены в часах
 b = 8 * 0.8
 # кол-во смен в месяце
