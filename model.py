@@ -8,30 +8,30 @@ def save_excel(path, data_frame, columns=True):
     writer_on.save()
 
 
-df = pd.read_excel('C:\\Users\\oshurek_m\\Desktop\\Пеленг общий.xlsx', sheet_name='matmod')
-df.info()
-df_1 = df[['Индекс RTB', 'Наименование детали', 'Кол-во', 'N° ITEM', 'Стоимость, $', 'CN', 'DART', 'TOUR']]
-df_2 = df_1.dropna(axis=0)
+# Подготовка исходных данных для расчетов
+df = pd.read_excel('entry.xlsx', sheet_name='model')
+df_2 = df.dropna(subset='наименование', axis=0)
 df_2.info()
 # величина смены в часах
 b = 8 * 0.8
 # кол-во смен в месяце
 c = 6
+# Создание модели
 model = LpProblem('prod', LpMaximize)
-names_det = list(df_2['N° ITEM'])
-print(len(names_det))
-costs = dict(zip(names_det, df_2['Стоимость, $']))
-cn = dict(zip(names_det, df_2['CN']))
-dart = dict(zip(names_det, df_2['DART']))
-tour = dict(zip(names_det, df_2['TOUR']))
+# Генерация словарей с значениями переменных
+names_det = list(df_2['item'])
+costs = dict(zip(names_det, df_2['стоимость']))
+cn = dict(zip(names_det, df_2['cn']))
+cn_4 = dict(zip(names_det, df_2['4_ось']))
+dart = dict(zip(names_det, df_2['dart']))
+tour = dict(zip(names_det, df_2['tour']))
 
-vat = LpVariable.dicts('vat', names_det, cat='Binary')
+vat = LpVariable.dicts('item', names_det, cat='Binary')
 
 costs_1 = []
 for n in vat:
     costs_1.append(n)
-#print(costs_1)
-cost_s1 = pd.Series(data=costs_1, name='N° ITEM')
+cost_s1 = pd.Series(data=costs_1, name='item')
 cost_df = cost_s1.to_frame()
 cost_df.info()
 cost_2 = []
@@ -39,7 +39,7 @@ for k in vat:
     cost_2.append(vat[k])
 cost_df = cost_df.assign(re_name=cost_2)
 
-model += lpSum(costs[i]*vat[i] for i in names_det)
+model += lpSum(costs[i] * vat[i] for i in names_det)
 t_cn = 1600
 t_dart = 765
 t_tour = 1080
@@ -51,14 +51,15 @@ t_tour = 1080
 count_cn = 16
 count_dart = 14
 count_tour = 8
-model += lpSum(cn[i]*vat[i] for i in names_det) <= t_cn
-model += lpSum(dart[i]*vat[i] for i in names_det) <= t_dart
-model += lpSum(tour[i]*vat[i] for i in names_det) <= t_tour
+model += lpSum(costs[i] * vat[i] for i in names_det)
+model += lpSum(cn[i] * vat[i] for i in names_det) <= t_cn
+model += lpSum(dart[i] * vat[i] for i in names_det) <= t_dart
+model += lpSum(tour[i] * vat[i] for i in names_det) <= t_tour
 for i in names_det:
-    model += ((cn[i] + dart[i] + tour[i])*vat[i]) <= c * b
-model += lpSum(cn[i]*vat[i] for i in names_det) <= c * b * count_cn
-model += lpSum(dart[i]*vat[i] for i in names_det) <= c * b * count_dart
-model += lpSum(tour[i]*vat[i] for i in names_det) <= c * b * count_tour
+    model += ((cn[i] + dart[i] + tour[i]) * vat[i]) <= c * b
+model += lpSum(cn[i] * vat[i] for i in names_det) <= c * b * count_cn
+model += lpSum(dart[i] * vat[i] for i in names_det) <= c * b * count_dart
+model += lpSum(tour[i] * vat[i] for i in names_det) <= c * b * count_tour
 model.solve()
 var_list = []
 print("Status:", LpStatus[model.status])
@@ -70,9 +71,10 @@ for v in model.variables():
 df_var = pd.DataFrame(data=var_list, columns=['re_name', 'var'])
 # print(df_var.head())
 # print(cost_df.head())
-df = df_var.merge(cost_df, on='re_name', how='outer')
+#df_out = df_var.merge(cost_df, on='re_name', how='outer')
+df_out = pd.concat([df_var, cost_df], axis=1)
 
-save_excel('C:\\Users\\oshurek_m\\Desktop\\matmod.xlsx', df)
+save_excel('result.xlsx', df_out)
 
 '''https://proglib.io/p/lineynoe-programmirovanie-praktika-resheniya-zadach-optimizacii-na-python-2020-11-26 
 https://www.machinelearningmastery.ru/linear-programming-and-discrete-optimization-with-python-using-pulp
