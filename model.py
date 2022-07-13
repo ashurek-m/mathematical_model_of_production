@@ -23,6 +23,10 @@ t_cn = df_rest.loc[0, 'limit_time_cn']
 t_dart = df_rest.loc[0, 'limit_time_dart']
 t_tour = df_rest.loc[0, 'limit_time_tour']
 t_cn4axe = df_rest.loc[0, 'limit_time_cn_4axe']
+count_cn = df_rest.loc[0, 'limit_count_cn']
+count_dart = df_rest.loc[0, 'limit_count_dart']
+count_tour = df_rest.loc[0, 'limit_count_tour']
+count_cn4axe = df_rest.loc[0, 'limit_count_cn_4axe']
 '''
 количество центров 18шт
 количество дартов 16шт
