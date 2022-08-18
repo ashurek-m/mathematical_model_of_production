@@ -23,10 +23,6 @@ t_cn = df_rest.loc[0, 'limit_time_cn']
 t_dart = df_rest.loc[0, 'limit_time_dart']
 t_tour = df_rest.loc[0, 'limit_time_tour']
 t_cn4axe = df_rest.loc[0, 'limit_time_cn_4axe']
-count_cn = df_rest.loc[0, 'limit_count_cn']
-count_dart = df_rest.loc[0, 'limit_count_dart']
-count_tour = df_rest.loc[0, 'limit_count_tour']
-count_cn4axe = df_rest.loc[0, 'limit_count_cn_4axe']
 '''
 количество центров 18шт
 количество дартов 16шт
@@ -51,7 +47,6 @@ vat = LpVariable.dicts('item', names_det, cat='Binary')
 
 model += lpSum(costs[i] * vat[i] for i in names_det)
 
-model += lpSum(costs[i] * vat[i] for i in names_det)
 model += lpSum(cn[i] * vat[i] for i in names_det) <= t_cn
 model += lpSum(dart[i] * vat[i] for i in names_det) <= t_dart
 model += lpSum(tour[i] * vat[i] for i in names_det) <= t_tour
