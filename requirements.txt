@@ -1,4 +1,4 @@
 pulp==2.6.0
-pandas==1.4.2
+pandas==1.4.3
 openpyxl==3.0.10
 xlsxwriter==3.0.3
